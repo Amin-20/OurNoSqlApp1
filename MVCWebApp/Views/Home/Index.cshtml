@@ -1,0 +1,166 @@
+﻿@using AzureStorageLibrary.Models
+@model HomeViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@*<select style="width: 200px;">
+    @foreach (var cityName in ViewBag.CityName)
+    {
+        <option value="@cityName">@cityName</option>
+    }*@
+</select>
+<h2>Add Store</h2>
+
+
+<form class="form-inline" asp-action="CreateStore" method="post" enctype="application/x-www-form-urlencoded">
+    <input class="form-control mr-1" asp-for="Store.CountryName" placeholder="Enter Country name" />
+    <input class="form-control mr-1" asp-for="Store.CityName" placeholder="Enter City name" />
+    <input class="form-control mr-1" asp-for="Store.Address" placeholder="Enter Address" />
+
+    <input type="hidden" asp-for="Store.RowKey" />
+    <input type="hidden" asp-for="Store.PartitionKey" />
+    <input type="hidden" asp-for="Store.ETag" />
+
+    <input class="btn btn-primary" type="submit" value="Add new store" />
+</form>
+<h2>Add Or Update Product</h2>
+
+<form class="form-inline" asp-action="@(ViewBag.IsUpdate ? "Update" : "Create")" method="post" enctype="application/x-www-form-urlencoded">
+    <input  class="form-control mr-1" asp-for="Product.Name" placeholder="Enter Name"/>
+    <input class="form-control mr-1" asp-for="Product.Price" placeholder="Enter Price" />
+    <input class="form-control mr-1" asp-for="Product.Stock" placeholder="Enter Stock" />
+    <input class="form-control mr-1" asp-for="Product.Color" placeholder="Enter Color" />
+    <select class="form-control mr-1" asp-for="Product.StoreKey">
+        @foreach (var store in ViewBag.stores as List<Store>)
+        {
+            <option value="@store.RowKey">@store.CityName</option>
+        }
+   
+    </select>
+
+
+    <input type="hidden" asp-for="Product.RowKey" />
+    <input type="hidden" asp-for="Product.PartitionKey" />
+    <input type="hidden" asp-for="Product.ETag" />
+
+    <input class="btn btn-primary" type="submit" value="@(ViewBag.IsUpdate ? "Update Product":"Add new Product")" />
+</form>
+
+
+
+<h1>Products</h1>
+
+<form class="form-inline" method="get" asp-action="Query">
+    <input type="number" name="filterPrice" />
+    <input type="submit" class="btn btn-dark" value="Query" />
+</form>
+
+<table class="table table-bordered">
+    <tr>
+        <th>RowKey</th>
+        <th>PartitionKey</th>
+        <th>Country Name</th>
+        <th>City Name</th>
+        <th>Adress</th>
+        <th>TimeStamp</th>
+        <th>Action</th>
+    </tr>
+
+    @if (ViewBag.stores != null)
+    {
+        @foreach (var item in ViewBag.stores as List<Store>)
+        {
+            <tr>
+                <td>
+                    @item.RowKey
+                </td>
+                <td>
+                    @item.PartitionKey
+                </td>
+                <td>
+                    @item.CountryName
+                </td>
+                <td>
+                    @item.CityName
+                </td>
+                <td>
+                    @item.Address
+                </td>
+                <td>
+                    @item.Timestamp
+                </td>
+
+                <td>
+                    <a class="btn btn-danger" asp-action="DeleteStore" asp-controller="Home"
+               asp-route-rowKey="@item.RowKey" asp-route-partitionKey="@item.PartitionKey">Delete</a>
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <p>No stores found.</p>
+    }
+</table>
+
+
+
+
+
+
+            <table class="table table-bordered">
+    <tr>
+        <th>RowKey</th>
+        <th>PartitionKey</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Color</th>
+        <th>TimeStamp</th>
+        <th>Store key </th>
+        <th>Actions</th>
+        <th>Actions</th>
+    </tr>
+
+    @foreach (var item in ViewBag.products as List<Product>)
+    {
+            <tr>
+                <td>
+                @item.RowKey
+                </td>
+                <td>
+                @item.PartitionKey
+                </td>
+                <td>
+                @item.Name
+                </td>
+                <td>
+                @item.Price
+                </td>
+                <td>
+                @item.Stock
+                </td>
+                <td>
+                @item.Color
+                </td>
+                <td>
+                @item.Timestamp
+                </td>
+            <td>
+                @item.StoreKey
+            </td>
+                <td>
+                    <a class="btn btn-danger" asp-action="Update" asp-controller="Home"
+                asp-route-rowKey="@item.RowKey" asp-route-partitionKey="@item.PartitionKey"
+                >Update</a>
+                </td>
+
+                <td>
+                    <a class="btn btn-danger" asp-action="Delete" asp-controller="Home"
+                   asp-route-rowKey="@item.RowKey" asp-route-partitionKey="@item.PartitionKey">Delete</a>
+                </td>
+            </tr>
+    }
+</table>
